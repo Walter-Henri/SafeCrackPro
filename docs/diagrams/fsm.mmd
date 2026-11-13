@@ -1,0 +1,34 @@
+stateDiagram-v2
+    [*] --> ST_EDIT_0 : POR / KEY0
+
+    state "ST_EDIT_0\n(HEX3 ativo)" as ST_EDIT_0
+    state "ST_EDIT_1\n(HEX2 ativo)" as ST_EDIT_1
+    state "ST_EDIT_2\n(HEX1 ativo)" as ST_EDIT_2
+    state "ST_EDIT_3\n(HEX0 ativo)" as ST_EDIT_3
+    state "ST_CHECK" as ST_CHECK
+    state "ST_SUCCESS\n(LEDG 5s)" as ST_SUCCESS
+    state "ST_FAIL\n(LEDR 3s)" as ST_FAIL
+
+    ST_EDIT_0 --> ST_EDIT_0 : KEY2(+) / KEY3(-)
+    ST_EDIT_0 --> ST_EDIT_1 : KEY1
+
+    ST_EDIT_1 --> ST_EDIT_1 : KEY2 / KEY3
+    ST_EDIT_1 --> ST_EDIT_2 : KEY1
+
+    ST_EDIT_2 --> ST_EDIT_2 : KEY2 / KEY3
+    ST_EDIT_2 --> ST_EDIT_3 : KEY1
+
+    ST_EDIT_3 --> ST_EDIT_3 : KEY2 / KEY3
+    ST_EDIT_3 --> ST_CHECK  : KEY1
+
+    ST_CHECK --> ST_SUCCESS : match
+    ST_CHECK --> ST_FAIL    : !match
+
+    ST_SUCCESS --> ST_EDIT_0 : timer==0
+    ST_FAIL    --> ST_EDIT_0 : timer==0
+
+    note right of ST_EDIT_0
+        KEY0 (reset) de qualquer estado
+        retorna a ST_EDIT_0
+        e zera todos os dígitos
+    end note

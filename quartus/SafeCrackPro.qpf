@@ -1,0 +1,11 @@
+# -------------------------------------------------------------------------- #
+#
+# Copyright (C) 2026 CIN0130 - Sistemas Digitais
+# Quartus Prime Project File
+# Compatible with Quartus Prime 21.1
+# Target Device: EP4CE115F29C7 (Terasic DE2-115)
+#
+# -------------------------------------------------------------------------- #
+
+QUARTUS_VERSION = "21.1"
+PROJECT_REVISION = "SafeCrackPro"

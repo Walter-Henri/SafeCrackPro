@@ -10,7 +10,7 @@ Os tempos de debounce e de feedback são reduzidos por parâmetros para tornar a
 
 | ID | Cenário | Resultado esperado |
 |----|---------|--------------------|
-| T01 | Power-on / estado inicial | Dígitos = 0, active_idx = 0, LEDs apagados |
+| T01 | Power-on / estado inicial | Dígitos = 0, HEX4 = 1, LEDs apagados |
 | T02 | Incremento sucessivo | 0 → 1 → 2 → 3 |
 | T03 | Decremento sucessivo | 3 → 2 → 1 |
 | T04 | Wrap-around superior | 9 → 0 |

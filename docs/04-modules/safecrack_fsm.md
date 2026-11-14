@@ -28,7 +28,7 @@ Controlar todo o fluxo de operação do cofre: edição dos quatro dígitos, ver
 | `key2_pulse` | input | Pulso limpo de incremento |
 | `key1_pulse` | input | Pulso limpo de confirmação |
 | `digit0`–`digit3` | output | Valores dos quatro dígitos |
-| `active_idx` | output | Índice do dígito em edição (0–3) |
+| `active_idx` | output | Índice interno (0–3); HEX4 exibe valor+1 (1–4) |
 | `ledg_on` / `ledr_on` | output | Controle dos LEDs |
 
 ## Regras de negócio implementadas

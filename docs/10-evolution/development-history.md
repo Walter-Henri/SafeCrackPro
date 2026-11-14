@@ -28,3 +28,9 @@
 | Timer dentro do FSM | Simplicidade | Evita módulo extra para uma contagem linear |
 | Debounce parametrizável | Simulação vs hardware | Permite reduzir o tempo em testbench sem alterar a lógica de produção |
 | Senha como parâmetros | Flexibilidade | Permite alterar a senha sem modificar o corpo do código |
+
+## Marco 5 – Ajuste do indicador HEX4 (1–4)
+
+- Orientação do monitor: o display adicional deve mostrar **1 a 4**, não 0 a 3.
+- Alteração pontual no top-level (`active_idx + 1`).
+- Documentação e testbench sincronizados (INC-002).

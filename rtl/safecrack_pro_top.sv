@@ -38,7 +38,7 @@ module safecrack_pro_top #(
     output logic [6:0]  HEX1,   // password digit 2
     output logic [6:0]  HEX2,   // password digit 1
     output logic [6:0]  HEX3,   // password digit 0 (MSB)
-    output logic [6:0]  HEX4,   // active digit index (0-3)
+    output logic [6:0]  HEX4,   // active digit indicator (shows 1–4)
 
     // LEDs
     output logic [8:0]  LEDG,   // green – success
@@ -134,7 +134,7 @@ module safecrack_pro_top #(
     bcd_to_7segment u_hex2 (.bcd(digit1),              .seg(HEX2));
     bcd_to_7segment u_hex1 (.bcd(digit2),              .seg(HEX1));
     bcd_to_7segment u_hex0 (.bcd(digit3),              .seg(HEX0)); // LSB
-    bcd_to_7segment u_hex4 (.bcd({2'b00, active_idx}), .seg(HEX4)); // index
+    bcd_to_7segment u_hex4 (.bcd({2'b00, active_idx} + 4'd1), .seg(HEX4)); // shows 1-4
 
     // -------------------------------------------------------------------------
     // LED drivers – all LEDs of the same colour light together

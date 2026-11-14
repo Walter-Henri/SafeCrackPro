@@ -6,7 +6,7 @@
 |----|-----------|---------------|
 | RF-01 | Senha composta por exatamente 4 dígitos (0–9) | Registradores `d0`–`d3` no módulo `safecrack_fsm` |
 | RF-02 | HEX3–HEX0 exibem os quatro dígitos simultaneamente | Instâncias de `bcd_to_7segment` |
-| RF-03 | HEX4 indica o índice do dígito ativo (0–3) | Sinal `active_idx` decodificado |
+| RF-03 | HEX4 indica o dígito ativo (1–4) | `active_idx + 1` decodificado em HEX4 |
 | RF-04 | KEY[3] decrementa o dígito ativo (wrap 0→9) | Lógica combinacional no FSM |
 | RF-05 | KEY[2] incrementa o dígito ativo (wrap 9→0) | Lógica combinacional no FSM |
 | RF-06 | KEY[1] confirma e avança; no 4º dígito inicia verificação | Transições ST_EDIT_* → ST_CHECK |

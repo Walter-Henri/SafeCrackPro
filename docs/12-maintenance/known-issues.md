@@ -7,4 +7,11 @@
 | KI-03 | Senha fixa em tempo de compilação | Não é possível alterar em runtime | Decisão de projeto; parâmetros facilitam alteração |
 | KI-04 | Debounce de 5 ms | Pode ser longo para alguns botões | Valor configurável via parâmetro |
 
-Nenhum bug funcional conhecido permanece aberto após a correção INC-001.
+## Incidentes corrigidos
+
+| ID | Descrição | Status |
+|----|-----------|--------|
+| [INC-001](../11-incidents/INC-001-7segment-decoder.md) | Padrões incorretos do decoder de 7 segmentos | Corrigido |
+| [INC-002](../11-incidents/INC-002-hex4-indexing.md) | HEX4 exibia 0–3 em vez de 1–4 | Corrigido |
+
+Nenhum bug funcional conhecido permanece aberto.

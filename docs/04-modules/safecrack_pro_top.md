@@ -26,7 +26,8 @@ Instanciar e interconectar todos os módulos do sistema, gerenciar o reset globa
 |-------|---------|---------|-----------|
 | `CLOCK_50` | input | 1 | Clock de 50 MHz da placa |
 | `KEY` | input | [3:0] | Push-buttons ativos em nível baixo |
-| `HEX0`–`HEX4` | output | [6:0] | Displays de 7 segmentos |
+| `HEX0`–`HEX3` | output | [6:0] | Dígitos da senha |
+| `HEX4` | output | [6:0] | Indicador do dígito ativo (**1–4**) |
 | `LEDG` | output | [8:0] | LEDs verdes |
 | `LEDR` | output | [17:0] | LEDs vermelhos |
 
@@ -44,3 +45,12 @@ Instanciar e interconectar todos os módulos do sistema, gerenciar o reset globa
 - `debounce`
 - `safecrack_fsm`
 - `bcd_to_7segment`
+
+
+## Observação – HEX4
+
+O valor exibido em HEX4 é \`active_idx + 1\`:
+- 1º dígito em edição → HEX4 = **1**
+- 2º dígito em edição → HEX4 = **2**
+- 3º dígito em edição → HEX4 = **3**
+- 4º dígito em edição → HEX4 = **4**

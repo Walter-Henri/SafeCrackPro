@@ -39,7 +39,7 @@ module safecrack_fsm #(
     output logic [3:0] digit1,          // value for HEX2
     output logic [3:0] digit2,          // value for HEX1
     output logic [3:0] digit3,          // value for HEX0 (LSB)
-    output logic [1:0] active_idx,      // 0=HEX3 … 3=HEX0 → shown on HEX4
+    output logic [1:0] active_idx,      // 0=HEX3 … 3=HEX0  (display shows 1-4)
     output logic       ledg_on,         // assert all green LEDs
     output logic       ledr_on          // assert all red LEDs
 );

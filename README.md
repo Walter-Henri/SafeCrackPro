@@ -59,7 +59,7 @@ SafeCrackPro/quartus/output_files/SafeCrackPro.sof
 | KEY[0]  | Reset completo                  |
 
 - **Senha padrão:** `1234`
-- HEX4 mostra o índice do dígito em edição (0 a 3)
+- HEX4 mostra o dígito ativo (1 a 4)
 - Senha correta → todos os **LEDs verdes** por 5 segundos
 - Senha incorreta → todos os **LEDs vermelhos** por 3 segundos
 
@@ -210,6 +210,10 @@ Toda a documentação profissional está organizada em:
 | Documentação | 10% | Documentação técnica completa sob `docs/` |
 
 ---
+
+## Changelog
+
+Histórico completo de alterações: [CHANGELOG.md](CHANGELOG.md)
 
 ## 9. Known Issues
 

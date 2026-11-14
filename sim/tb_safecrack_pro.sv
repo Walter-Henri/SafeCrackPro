@@ -99,7 +99,7 @@ module tb_safecrack_pro;
         assert (hex_to_str(HEX2) == "0") else $error("HEX2 not 0");
         assert (hex_to_str(HEX1) == "0") else $error("HEX1 not 0");
         assert (hex_to_str(HEX0) == "0") else $error("HEX0 not 0");
-        assert (hex_to_str(HEX4) == "0") else $error("HEX4 (active idx) not 0");
+        assert (hex_to_str(HEX4) == "1") else $error("HEX4 (active digit) not 1");
         assert (LEDG == 9'b0) else $error("LEDG not off");
         assert (LEDR == 18'b0) else $error("LEDR not off");
         $display("  PASS: all digits 0, active=0, LEDs off");
@@ -143,20 +143,20 @@ module tb_safecrack_pro;
         $display("\n[T6] Confirm & advance (enter password 1234)");
         // set first digit = 1
         press_key(2); // 0->1
-        press_key(1); // confirm -> go to digit 1, HEX4 should be 1
-        assert (hex_to_str(HEX4) == "1") else $error("active_idx not 1");
+        press_key(1); // confirm -> go to digit 2, HEX4 should show 2
+        assert (hex_to_str(HEX4) == "2") else $error("active digit not 2");
         assert (hex_to_str(HEX3) == "1") else $error("digit0 lost");
 
         // second digit = 2
         press_key(2); press_key(2); // 0->1->2
         press_key(1);
-        assert (hex_to_str(HEX4) == "2");
+        assert (hex_to_str(HEX4) == "3") else $error("active digit not 3");
         assert (hex_to_str(HEX2) == "2");
 
         // third digit = 3
         press_key(2); press_key(2); press_key(2);
         press_key(1);
-        assert (hex_to_str(HEX4) == "3");
+        assert (hex_to_str(HEX4) == "4") else $error("active digit not 4");
         assert (hex_to_str(HEX1) == "3");
 
         // fourth digit = 4
@@ -178,7 +178,7 @@ module tb_safecrack_pro;
         repeat (SUCCESS_CYCLES + 10) @(posedge clk);
         assert (LEDG == 9'b0) else $error("LEDG did not turn off after timeout");
         assert (hex_to_str(HEX3) == "0") else $error("digits not cleared after success");
-        assert (hex_to_str(HEX4) == "0") else $error("active idx not reset");
+        assert (hex_to_str(HEX4) == "1") else $error("active digit not reset to 1");
         $display("  PASS: auto return to initial after success timeout");
 
         //------------------------------------------------------------------
@@ -197,7 +197,7 @@ module tb_safecrack_pro;
 
         repeat (FAIL_CYCLES + 10) @(posedge clk);
         assert (LEDR == 18'b0) else $error("LEDR did not turn off");
-        assert (hex_to_str(HEX4) == "0");
+        assert (hex_to_str(HEX4) == "1");
         $display("  PASS: auto return after fail timeout");
 
         //------------------------------------------------------------------
@@ -218,7 +218,7 @@ module tb_safecrack_pro;
         press_key(0); // reset
         repeat (10) @(posedge clk);
         assert (hex_to_str(HEX3) == "0");
-        assert (hex_to_str(HEX4) == "0");
+        assert (hex_to_str(HEX4) == "1");
         assert (LEDG == 9'b0 && LEDR == 18'b0);
         $display("  PASS: KEY0 resets system");
 

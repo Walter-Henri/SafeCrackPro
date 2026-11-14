@@ -47,9 +47,11 @@ stateDiagram-v2
 
 ## Convenção do dígito ativo
 
-| active_idx | Display editado | Posição na senha |
-|------------|-----------------|------------------|
-| 0 | HEX3 | 1º dígito (MSB) |
-| 1 | HEX2 | 2º dígito |
-| 2 | HEX1 | 3º dígito |
-| 3 | HEX0 | 4º dígito (LSB) |
+O sinal interno `active_idx` usa 0–3. O valor exibido em **HEX4** é `active_idx + 1` (ou seja, 1–4), conforme orientação do monitor.
+
+| active_idx (interno) | Valor em HEX4 | Display editado | Posição na senha |
+|----------------------|---------------|-----------------|------------------|
+| 0 | **1** | HEX3 | 1º dígito (MSB) |
+| 1 | **2** | HEX2 | 2º dígito |
+| 2 | **3** | HEX1 | 3º dígito |
+| 3 | **4** | HEX0 | 4º dígito (LSB) |

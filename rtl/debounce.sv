@@ -1,35 +1,32 @@
 // =============================================================================
-// Module      : debounce
-// Project     : SafeCrack Pro – CIN0130 Sistemas Digitais
-// Description : Button synchronizer + debouncer + rising-edge detector
+// Módulo     : debounce
+// Projeto    : SafeCrack Pro – CIN0130 Sistemas Digitais
+// Descrição  : Elimina bouncing de push-button e gera um pulso de 1 ciclo
+//              por pressionamento, independente do tempo de segurar o botão.
 //
-// The DE2-115 push-buttons are active-LOW (pressed = 0).
-// This module:
-//   1. Synchronizes the asynchronous button signal with a 2-FF synchronizer
-//   2. Debounces the cleaned signal with a configurable counter
-//   3. Generates a single-cycle pulse on a clean press (rising edge after invert)
-//
-// Parameter DEBOUNCE_CYCLES controls the debounce window.
-// Default 250_000 cycles ≈ 5 ms at 50 MHz (adequate for mechanical buttons).
-// Reduce this value for faster simulation.
+// Comportamento:
+//   1. Sincroniza btn_n (ativo-baixo) com 2 FFs para evitar metaestabilidade.
+//   2. Um contador de DEBOUNCE_CYCLES ciclos valida o estado estável.
+//   3. Uma detecção de borda de subida sobre o sinal estável gera btn_pulse
+//      com exatamente 1 ciclo de duração.
 // =============================================================================
 module debounce #(
-    parameter int DEBOUNCE_CYCLES = 250_000
+    parameter int DEBOUNCE_CYCLES = 250_000  // ≈ 5 ms @ 50 MHz
 )(
     input  logic clk,
-    input  logic rst_n,      // active-low reset
-    input  logic btn_n,      // active-low button from KEY[]
-    output logic btn_pulse   // single-cycle active-high pulse on clean press
+    input  logic rst_n,
+    input  logic btn_n,       // entrada ativo-baixo do push-button
+    output logic btn_pulse    // pulso de 1 ciclo por pressionamento válido
 );
 
     // -------------------------------------------------------------------------
-    // 2-FF synchronizer (metastability protection)
+    // Sincronizador de 2 estágios
     // -------------------------------------------------------------------------
     logic btn_sync_0, btn_sync_1;
 
     always_ff @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
-            btn_sync_0 <= 1'b1;   // released (active-low idle)
+            btn_sync_0 <= 1'b1;
             btn_sync_1 <= 1'b1;
         end else begin
             btn_sync_0 <= btn_n;
@@ -37,12 +34,14 @@ module debounce #(
         end
     end
 
-    // Convert to active-high
+    // Converte para nível ativo-alto após a sincronização
     logic btn_raw;
     assign btn_raw = ~btn_sync_1;
 
     // -------------------------------------------------------------------------
-    // Debounce counter
+    // Contador de debounce
+    // O contador reinicia sempre que o sinal muda; ao atingir DEBOUNCE_CYCLES,
+    // confirma o estado estável.
     // -------------------------------------------------------------------------
     logic [$clog2(DEBOUNCE_CYCLES+1)-1:0] cnt;
     logic btn_stable;
@@ -53,30 +52,30 @@ module debounce #(
             btn_stable <= 1'b0;
         end else begin
             if (btn_raw != btn_stable) begin
-                if (cnt >= DEBOUNCE_CYCLES-1) begin
-                    btn_stable <= btn_raw;
+                if (cnt == DEBOUNCE_CYCLES - 1) begin
+                    btn_stable <= btn_raw; // confirma novo estado
                     cnt        <= '0;
                 end else begin
                     cnt <= cnt + 1'b1;
                 end
             end else begin
-                cnt <= '0;
+                cnt <= '0; // sinal mudou antes do timeout: reinicia contagem
             end
         end
     end
 
     // -------------------------------------------------------------------------
-    // Rising-edge detector on the stable signal
+    // Detector de borda de subida
+    // Gera btn_pulse por exatamente 1 ciclo no primeiro ciclo estável.
+    // Segurar o botão não repete a ação.
     // -------------------------------------------------------------------------
     logic btn_stable_d;
 
     always_ff @(posedge clk or negedge rst_n) begin
-        if (!rst_n)
-            btn_stable_d <= 1'b0;
-        else
-            btn_stable_d <= btn_stable;
+        if (!rst_n) btn_stable_d <= 1'b0;
+        else        btn_stable_d <= btn_stable;
     end
 
-    assign btn_pulse = btn_stable & ~btn_stable_d;
+    assign btn_pulse = btn_stable & ~btn_stable_d;  // 1 ciclo apenas
 
 endmodule

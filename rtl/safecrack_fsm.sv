@@ -1,75 +1,75 @@
 // =============================================================================
-// Module      : safecrack_fsm
-// Project     : SafeCrack Pro – CIN0130 Sistemas Digitais
-// Description : Main finite-state machine of SafeCrack Pro
+// Módulo     : safecrack_fsm
+// Projeto    : SafeCrack Pro – CIN0130 Sistemas Digitais
+// Descrição  : Máquina de estados principal do SafeCrack Pro
 //
-// This module evolves the original classroom SafeCrack FSM
-// (GitLab snippet 4909655). Instead of a fixed button sequence, the user
-// composes a 4-digit password (0-9) using the push-buttons:
+// Evolução da FSM original desenvolvida em sala (snippet GitLab 4909655).
+// Em vez de uma sequência fixa de botões, o usuário compõe uma senha de
+// 4 dígitos (0–9) usando os push-buttons:
 //
-//   KEY[3] → decrement active digit (wrap-around 0↔9)
-//   KEY[2] → increment active digit (wrap-around 0↔9)
-//   KEY[1] → confirm digit and advance (or verify on last digit)
-//   KEY[0] → global reset (handled outside this module)
+//   KEY[3] → decrementa o dígito ativo (wrap-around 0↔9)
+//   KEY[2] → incrementa o dígito ativo (wrap-around 0↔9)
+//   KEY[1] → confirma o dígito e avança (ou verifica no último dígito)
+//   KEY[0] → reset global (tratado fora deste módulo)
 //
-// After the fourth confirmation the password is compared with the parameters
-// PASSWORD_D*. Feedback is given through LEDG (success, 5 s) or LEDR
-// (failure, 3 s). The system then returns automatically to the initial state.
+// Após a quarta confirmação, a senha é comparada com os parâmetros
+// PASSWORD_D*. O resultado é indicado via LEDG (sucesso, 5 s) ou LEDR
+// (falha, 3 s), retornando automaticamente ao estado inicial.
 //
-// Architecture: classic three-process FSM
-//   - Sequential state / data registers
-//   - Combinational next-state + datapath logic
-//   - Combinational output logic
+// Arquitetura: FSM clássica de três processos
+//   - Registradores sequenciais de estado e dados
+//   - Lógica combinacional de próximo estado e datapath
+//   - Lógica combinacional de saída
 // =============================================================================
 module safecrack_fsm #(
-    parameter logic [3:0] PASSWORD_D0 = 4'd1,   // digit shown on HEX3
-    parameter logic [3:0] PASSWORD_D1 = 4'd2,   // digit shown on HEX2
-    parameter logic [3:0] PASSWORD_D2 = 4'd3,   // digit shown on HEX1
-    parameter logic [3:0] PASSWORD_D3 = 4'd4,   // digit shown on HEX0
+    parameter logic [3:0] PASSWORD_D0 = 4'd1,   // dígito exibido em HEX3
+    parameter logic [3:0] PASSWORD_D1 = 4'd2,   // dígito exibido em HEX2
+    parameter logic [3:0] PASSWORD_D2 = 4'd3,   // dígito exibido em HEX1
+    parameter logic [3:0] PASSWORD_D3 = 4'd4,   // dígito exibido em HEX0
     parameter int SUCCESS_CYCLES = 250_000_000, // 5 s @ 50 MHz
     parameter int FAIL_CYCLES    = 150_000_000  // 3 s @ 50 MHz
 )(
     input  logic       clk,
-    input  logic       rst_n,           // active-low synchronous reset
-    input  logic       key3_pulse,      // clean pulse: decrement
-    input  logic       key2_pulse,      // clean pulse: increment
-    input  logic       key1_pulse,      // clean pulse: confirm / next
+    input  logic       rst_n,           // reset síncrono ativo-baixo
+    input  logic       key3_pulse,      // pulso limpo: decrementa
+    input  logic       key2_pulse,      // pulso limpo: incrementa
+    input  logic       key1_pulse,      // pulso limpo: confirma / avança
 
-    output logic [3:0] digit0,          // value for HEX3 (MSB)
-    output logic [3:0] digit1,          // value for HEX2
-    output logic [3:0] digit2,          // value for HEX1
-    output logic [3:0] digit3,          // value for HEX0 (LSB)
-    output logic [1:0] active_idx,      // 0=HEX3 … 3=HEX0  (display shows 1-4)
-    output logic       ledg_on,         // assert all green LEDs
-    output logic       ledr_on          // assert all red LEDs
+    output logic [3:0] digit0,          // valor para HEX3 (MSB)
+    output logic [3:0] digit1,          // valor para HEX2
+    output logic [3:0] digit2,          // valor para HEX1
+    output logic [3:0] digit3,          // valor para HEX0 (LSB)
+    output logic [1:0] active_idx,      // 0=HEX3 … 3=HEX0 (display mostra 1–4)
+    output logic       ledg_on,         // aciona todos os LEDs verdes
+    output logic       ledr_on          // aciona todos os LEDs vermelhos
 );
 
     // -------------------------------------------------------------------------
-    // State encoding
-    // Sequential numeric values keep the code simple and readable.
+    // Codificação dos estados
+    // Valores numéricos sequenciais mantêm o código simples e legível.
     // -------------------------------------------------------------------------
     typedef enum logic [3:0] {
-        ST_EDIT_0  = 4'd0,  // editing first digit  (HEX3)
-        ST_EDIT_1  = 4'd1,  // editing second digit (HEX2)
-        ST_EDIT_2  = 4'd2,  // editing third digit  (HEX1)
-        ST_EDIT_3  = 4'd3,  // editing fourth digit (HEX0)
-        ST_CHECK   = 4'd4,  // one-cycle password comparison
-        ST_SUCCESS = 4'd5,  // green LEDs for SUCCESS_CYCLES
-        ST_FAIL    = 4'd6   // red LEDs for FAIL_CYCLES
+        ST_EDIT_0  = 4'd0,  // edição do 1º dígito (HEX3)
+        ST_EDIT_1  = 4'd1,  // edição do 2º dígito (HEX2)
+        ST_EDIT_2  = 4'd2,  // edição do 3º dígito (HEX1)
+        ST_EDIT_3  = 4'd3,  // edição do 4º dígito (HEX0)
+        ST_CHECK   = 4'd4,  // comparação da senha (1 ciclo)
+        ST_SUCCESS = 4'd5,  // LEDs verdes por SUCCESS_CYCLES
+        ST_FAIL    = 4'd6   // LEDs vermelhos por FAIL_CYCLES
     } state_t;
 
     state_t state, next_state;
 
-    // Digit registers and next values
+    // Registradores dos dígitos e próximos valores
     logic [3:0] d0, d1, d2, d3;
     logic [3:0] next_d0, next_d1, next_d2, next_d3;
     logic [1:0] idx, next_idx;
 
-    // Feedback timer
+    // Timer de feedback
     logic [$clog2(SUCCESS_CYCLES+1)-1:0] timer, next_timer;
 
     // -------------------------------------------------------------------------
-    // Sequential logic (registers)
+    // Lógica sequencial (registradores)
     // -------------------------------------------------------------------------
     always_ff @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
@@ -92,10 +92,10 @@ module safecrack_fsm #(
     end
 
     // -------------------------------------------------------------------------
-    // Combinational next-state and datapath logic
+    // Lógica combinacional de próximo estado e datapath
     // -------------------------------------------------------------------------
     always_comb begin
-        // Default assignments (hold current values)
+        // Atribuições padrão (mantém valores atuais)
         next_state = state;
         next_d0    = d0;
         next_d1    = d1;
@@ -107,12 +107,12 @@ module safecrack_fsm #(
         unique case (state)
 
             // -----------------------------------------------------------------
-            // Digit-editing states
-            // KEY[2] increments, KEY[3] decrements the active digit.
-            // KEY[1] confirms and advances (or goes to ST_CHECK on last digit).
+            // Estados de edição de dígito
+            // KEY[2] incrementa, KEY[3] decrementa o dígito ativo.
+            // KEY[1] confirma e avança (ou vai para ST_CHECK no último dígito).
             // -----------------------------------------------------------------
             ST_EDIT_0, ST_EDIT_1, ST_EDIT_2, ST_EDIT_3: begin
-                // Increment (KEY2)
+                // Incrementa (KEY2)
                 if (key2_pulse) begin
                     unique case (idx)
                         2'd0: next_d0 = (d0 == 4'd9) ? 4'd0 : d0 + 4'd1;
@@ -121,7 +121,7 @@ module safecrack_fsm #(
                         2'd3: next_d3 = (d3 == 4'd9) ? 4'd0 : d3 + 4'd1;
                     endcase
                 end
-                // Decrement (KEY3)
+                // Decrementa (KEY3)
                 if (key3_pulse) begin
                     unique case (idx)
                         2'd0: next_d0 = (d0 == 4'd0) ? 4'd9 : d0 - 4'd1;
@@ -130,7 +130,7 @@ module safecrack_fsm #(
                         2'd3: next_d3 = (d3 == 4'd0) ? 4'd9 : d3 - 4'd1;
                     endcase
                 end
-                // Confirm / advance (KEY1)
+                // Confirma / avança (KEY1)
                 if (key1_pulse) begin
                     if (idx == 2'd3) begin
                         next_state = ST_CHECK;
@@ -142,7 +142,7 @@ module safecrack_fsm #(
             end
 
             // -----------------------------------------------------------------
-            // Password verification (single cycle)
+            // Verificação da senha (ciclo único)
             // -----------------------------------------------------------------
             ST_CHECK: begin
                 if ( (d0 == PASSWORD_D0) &&
@@ -158,13 +158,13 @@ module safecrack_fsm #(
             end
 
             // -----------------------------------------------------------------
-            // Success feedback – green LEDs for 5 seconds
+            // Feedback de sucesso – LEDs verdes por 5 segundos
             // -----------------------------------------------------------------
             ST_SUCCESS: begin
                 if (timer > 0) begin
                     next_timer = timer - 1'b1;
                 end else begin
-                    // Auto-return to initial state
+                    // Retorno automático ao estado inicial
                     next_state = ST_EDIT_0;
                     next_d0    = 4'd0;
                     next_d1    = 4'd0;
@@ -176,7 +176,7 @@ module safecrack_fsm #(
             end
 
             // -----------------------------------------------------------------
-            // Failure feedback – red LEDs for 3 seconds
+            // Feedback de falha – LEDs vermelhos por 3 segundos
             // -----------------------------------------------------------------
             ST_FAIL: begin
                 if (timer > 0) begin
@@ -197,7 +197,7 @@ module safecrack_fsm #(
     end
 
     // -------------------------------------------------------------------------
-    // Output logic
+    // Lógica de saída
     // -------------------------------------------------------------------------
     assign digit0     = d0;
     assign digit1     = d1;

@@ -44,10 +44,10 @@ module safecrack_fsm #(
     output logic       ledr_on          // aciona todos os LEDs vermelhos
 );
 
-    // -------------------------------------------------------------------------
+   
     // Codificação dos estados
     // Valores numéricos sequenciais mantêm o código simples e legível.
-    // -------------------------------------------------------------------------
+   
     typedef enum logic [3:0] {
         ST_EDIT_0  = 4'd0,  // edição do 1º dígito (HEX3)
         ST_EDIT_1  = 4'd1,  // edição do 2º dígito (HEX2)
@@ -68,9 +68,9 @@ module safecrack_fsm #(
     // Timer de feedback
     logic [$clog2(SUCCESS_CYCLES+1)-1:0] timer, next_timer;
 
-    // -------------------------------------------------------------------------
+   
     // Lógica sequencial (registradores)
-    // -------------------------------------------------------------------------
+   
     always_ff @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
             state  <= ST_EDIT_0;
@@ -91,9 +91,9 @@ module safecrack_fsm #(
         end
     end
 
-    // -------------------------------------------------------------------------
+   
     // Lógica combinacional de próximo estado e datapath
-    // -------------------------------------------------------------------------
+   
     always_comb begin
         // Atribuições padrão (mantém valores atuais)
         next_state = state;
@@ -196,9 +196,9 @@ module safecrack_fsm #(
         endcase
     end
 
-    // -------------------------------------------------------------------------
+   
     // Lógica de saída
-    // -------------------------------------------------------------------------
+   
     assign digit0     = d0;
     assign digit1     = d1;
     assign digit2     = d2;

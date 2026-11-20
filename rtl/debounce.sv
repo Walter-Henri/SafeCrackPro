@@ -19,9 +19,9 @@ module debounce #(
     output logic btn_pulse    // pulso de 1 ciclo por pressionamento válido
 );
 
-    // -------------------------------------------------------------------------
+   
     // Sincronizador de 2 estágios
-    // -------------------------------------------------------------------------
+   
     logic btn_sync_0, btn_sync_1;
 
     always_ff @(posedge clk or negedge rst_n) begin
@@ -38,11 +38,11 @@ module debounce #(
     logic btn_raw;
     assign btn_raw = ~btn_sync_1;
 
-    // -------------------------------------------------------------------------
+   
     // Contador de debounce
     // O contador reinicia sempre que o sinal muda; ao atingir DEBOUNCE_CYCLES,
     // confirma o estado estável.
-    // -------------------------------------------------------------------------
+   
     logic [$clog2(DEBOUNCE_CYCLES+1)-1:0] cnt;
     logic btn_stable;
 
@@ -64,11 +64,11 @@ module debounce #(
         end
     end
 
-    // -------------------------------------------------------------------------
+   
     // Detector de borda de subida
     // Gera btn_pulse por exatamente 1 ciclo no primeiro ciclo estável.
     // Segurar o botão não repete a ação.
-    // -------------------------------------------------------------------------
+   
     logic btn_stable_d;
 
     always_ff @(posedge clk or negedge rst_n) begin
